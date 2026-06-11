@@ -1,0 +1,9 @@
+# Format kalender news XAU Trend Capture v1
+# Satu event per baris: YYYY.MM.DD HH:MM;TAG  — waktu GMT.
+# Tag yang dipakai blueprint: NFP, CPI, FOMC, RATE (rate decision bank sentral utama).
+# Baris diawali '#' dan baris kosong diabaikan.
+# File 10 tahun penuh (2015-2025) dibuat di Langkah 3 — ini hanya contoh format.
+2024.06.07 12:30;NFP
+2024.06.12 12:30;CPI
+2024.06.12 18:00;FOMC
+2024.06.06 12:15;RATE

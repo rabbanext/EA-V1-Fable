@@ -9,10 +9,14 @@ adalah fase **implementasi & validasi**.
 | Langkah | Deliverable | Status |
 |---|---|---|
 | 1 | Arsitektur & pseudocode — [`docs/01_arsitektur_pseudocode.md`](docs/01_arsitektur_pseudocode.md) | ✅ |
-| 2 | Implementasi MQL5 penuh (`MQL5/`) | ⬜ |
+| 2 | Implementasi MQL5 penuh (`MQL5/`) — lihat [`MQL5/README.md`](MQL5/README.md) | ✅ kode lengkap, ⚠️ belum dikompilasi pemilik |
 | 3 | Rencana backtest + akuisisi data tick + kalender news CSV | ⬜ |
 | 4 | Skrip analisis Python (`analysis/`) | ⬜ |
 | 5 | Checklist pre-demo & pre-live | ⬜ |
+
+> **KEPUTUSAN TERBUKA:** modal < $1.000 di akun Standard membuat spek tidak bisa trade
+> (gap cap < lot minimum). Rekomendasi: **Exness Standard Cent**. Hitungan lengkap:
+> [`docs/00_catatan_modal_akun.md`](docs/00_catatan_modal_akun.md).
 
 ## Aturan main (ringkas)
 
