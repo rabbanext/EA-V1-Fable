@@ -10,7 +10,7 @@ adalah fase **implementasi & validasi**.
 |---|---|---|
 | 1 | Arsitektur & pseudocode — [`docs/01_arsitektur_pseudocode.md`](docs/01_arsitektur_pseudocode.md) | ✅ |
 | 2 | Implementasi MQL5 penuh (`MQL5/`) — lihat [`MQL5/README.md`](MQL5/README.md) | ✅ kode lengkap, ⚠️ belum dikompilasi pemilik |
-| 3 | Rencana backtest + akuisisi data tick + kalender news CSV | ⬜ |
+| 3 | Rencana backtest — [`docs/02_rencana_backtest.md`](docs/02_rencana_backtest.md) + kalender news [`analysis/generate_news_calendar.py`](analysis/generate_news_calendar.py) | ✅ |
 | 4 | Skrip analisis Python (`analysis/`) | ⬜ |
 | 5 | Checklist pre-demo & pre-live | ⬜ |
 
