@@ -52,15 +52,19 @@ void OnStart()
       Print("WARNING: lots=0 -> RJ_LOT_BELOW_MIN akan terpicu. Lihat docs/00.");
 
    // ---- Swap estimate ----
-   double swapLongPts = SymbolInfoDouble(sym, SYMBOL_SWAP_LONG);
+   // Untuk "Swap type = In Points": swap$ per lot = swap_pts × tick_value.
+   // BUKAN × (tv/ts): tv sudah per-point (per-tick); membagi ts menambah faktor 1000× salah.
+   // Cross-check: 100 oz × $3.300 × ~5.5%/tahun / 365 ≈ $49.6/lot/hari → konsisten.
+   double swapLongPts  = SymbolInfoDouble(sym, SYMBOL_SWAP_LONG);
    double swapShortPts = SymbolInfoDouble(sym, SYMBOL_SWAP_SHORT);
-   double swapPerLot = swapLongPts * tv / ts;   // $/lot/hari untuk long
-   double swapPos    = lots * MathAbs(swapPerLot);
-   double swapR1R    = (riskActual > 0) ? swapPos / riskActual : 0.0;
+   double swapPerLot   = swapLongPts  * tv;   // $/lot/hari long  [BUGFIX: bukan * tv/ts]
+   double swapShortLot = swapShortPts * tv;   // $/lot/hari short
+   double swapPos      = lots * MathAbs(swapPerLot);
+   double swapR1R      = (riskActual > 0) ? swapPos / riskActual : 0.0;
 
    PrintFormat("--- Swap (long) ---");
    PrintFormat("Swap pts/lot/hari : %.1f pts", swapLongPts);
-   PrintFormat("Swap $/lot/hari   : %.4f  (short: %.4f)", swapPerLot, swapShortPts * tv / ts);
+   PrintFormat("Swap $/lot/hari   : %.4f  (short: %.4f)", swapPerLot, swapShortLot);
    PrintFormat("Swap posisi %.2f lot: %.4f $/hari", lots, swapPos);
    PrintFormat("Swap per 1R per hari : %.4fR", swapR1R);
    PrintFormat("Swap per 10-hari     : %.4fR  (time-stop ~2.5 hari: %.4fR)",

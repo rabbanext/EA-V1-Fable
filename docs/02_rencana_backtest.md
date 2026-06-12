@@ -24,7 +24,7 @@ Period       : H1  (EA berjalan di H1; multi-TF H4 diambil lewat handle iMA)
 Model        : Every tick based on real ticks  ← WAJIB; mode lain = distribusi R palsu
 Deposit      : 10 000 USD
 Leverage     : 1:2000 (default demo Exness; tidak mempengaruhi risk — kami pakai SL %)
-Date range   : 2015.01.01 – 2025.06.01
+Date range   : 2017.01.02 – 2025.12.31  ← BUKAN 2015; lihat §4 kualitas data
 Forward test : OFF di pass pertama (lihat §5 walk-forward)
 Optimization : OFF kecuali untuk uji sensitivitas plateau ±30%
 ```
@@ -54,7 +54,26 @@ broker). Jika mode setiap-tick menggunakan spread tetap, ubah ke angka realistis
 
 ---
 
-## 3. Sizing tipikal di akun demo
+## 3. Sizing tipikal di akun demo — dampak gap cap lintas regime ATR
+
+Gap cap tetap = 0.04 lot (independen ATR, berubah hanya dengan equity). Gap cap mengikat
+selalu saat ATR < $6.25 (stop < $12.50). Ini **desain yang disengaja** (ATR rendah ≠ risiko
+gap rendah), tapi implikasinya besar untuk 2017–2023:
+
+| Periode | ATR H1 | Lots aktual | R aktual/target | Keterangan |
+|---|---|---|---|---|
+| 2017-2019 | ~$2 | 0.04 lot | $16 / $50 = **32%** | Gap cap sangat mengikat |
+| 2020-2022 | ~$4 | 0.04 lot | $32 / $50 = **64%** | Gap cap mengikat |
+| 2023-2024 | ~$5 | 0.04 lot | $40 / $50 = **80%** | Gap cap hampir tidak mengikat |
+| 2025+ | ~$9 | 0.02 lot | $36 / $50 = **72%** | Lot step floor yang mengikat |
+
+**Implikasi untuk analisis Python (Langkah 4):**
+- R-multiple WAJIB dihitung dari **risiko aktual** (`riskMoney` di trade list CSV), bukan target 0.5%.
+- Perbandingan antar periode: annual net R (bukan %), karena sizing berbeda tiap era.
+- Ekspektansi dalam % ekuitas akan LEBIH RENDAH dari blueprint $100K (karena modal kecil
+  + gap cap + rounding step) — ini bukan bug, ini efek skala yang terdokumentasi.
+
+
 
 Catatan: ATR H1 emas bergantung volatilitas periode. Tabel untuk orientasi:
 
@@ -71,7 +90,35 @@ Ini acceptable; backtest Langkah 4 akan menghitung distribusi lot aktual.
 
 ---
 
-## 4. Sumber data tick
+## 4. Temuan kritis: kualitas data H1 dari broker
+
+Data H1 yang diekspor (55.405 bar, 2015-2026) mengandung dua format berbeda:
+
+| Periode | Format aktual | Bar/hari | Kesimpulan |
+|---|---|---|---|
+| 2015–2016 | **DAILY bar** (bukan H1!) | 1 | Tidak bisa dipakai untuk backtest H1 |
+| 2017–2025 | H1 proper | ~23 | ✓ Bisa dipakai, 46.000+ bar |
+
+**Tandanya:** baris 2015-2016 semua bertimestamp 00:00:00 dan rentang High-Low = $12–14 (setara daily range), bukan $2–3 (H1 range tipikal 2017-era). Broker Exness tidak menyimpan data H1 sebelum ~2017.
+
+**Konsekuensi:** rentang backtest valid = **2017.01.02 – 2025.12.31** (9 tahun).
+- 9 tahun × ~50–100 trade/tahun = **450–900 trade total** — cukup untuk protokol validasi.
+- Walk-forward: 6 jendela OOS (2020–2025), ~300–600 trade OOS.
+- Untuk 2015-2016: perlu data eksternal (Dukascopy via Tickstory) — opsional, bukan blocker.
+
+**Regime ATR yang tercakup dalam data valid:**
+
+| Periode | ATR H1 median | Gold level | Catatan |
+|---|---|---|---|
+| 2017–2019 | ~$2 | $1.200–1.350 | Fase sideways, gap cap sangat mengikat |
+| 2020–2021 | ~$5 | $1.500–2.000 | COVID rally, volatilitas tinggi |
+| 2022–2023 | ~$4 | $1.700–2.000 | Rate hike Fed |
+| 2024 | ~$5 | $2.000–2.700 | Awal breakout ATH |
+| 2025 | ~$9 | $2.800–3.400 | Gold ATH baru |
+
+Variasi ATR 4× dalam dataset = **stres test alami** untuk sistem (lihat §3 sizing).
+
+## 4b. Sumber data tick
 
 ### Opsi A — Data broker (mudah, terbatas historis)
 
