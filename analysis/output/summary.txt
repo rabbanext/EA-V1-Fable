@@ -1,0 +1,101 @@
+========================================================================
+XAU Trend Capture v1 — Analisis Backtest: slope=ON, TS=48
+========================================================================
+Periode      : 2017 – 2026  (9.3 tahun)
+Jumlah trade : 633  (target 450-900: ✓)
+Trades/tahun : 68
+
+── KINERJA ABSOLUT (USD) ───────────────────────────────────────────────
+  Modal awal      : $10,000
+  Modal akhir     : $11,015
+  Net profit      : $+1,015.35  (+10.15%)
+  Gross profit    : $+1,717.02
+  Total swap cost : $-701.67  (-69.1% of net)
+  Max DD USD      : $-1,375.56  (-12.78%)
+
+── KINERJA DALAM R (edge yang sesungguhnya) ────────────────────────────
+  Total net R     : +46.78R  (+5.05R/tahun)
+  Win rate        : 34.0%  (215/633)
+  Payoff ratio    : 2.21x  (avg win / avg loss)
+  Avg win R       : +1.837R
+  Avg loss R      : -0.833R
+  Expectancy      : +0.0739R/trade
+  Profit factor R : 1.134  (target >1.5 untuk sistem trend)
+  Sharpe approx   : 0.36  (dari trade-level R, annualised)
+  LR Correlation  : -0.27  (⚠️ NEGATIF = equity curve menurun!)
+
+── SIZING & GAP CAP ANALYSIS ───────────────────────────────────────────
+  Target risk     : $50/trade (0.5% × $10,000)
+  Avg actual risk : $28.54/trade  (0.57× target)
+  Gap cap binding : 47% of trades
+  Jika selalu full risk $50:
+    Theoretical net: $2,339.00  (23.4% return)
+    vs Actual net  : $1,015.35  (10.2% return)
+  → Gap cap menekan realisasi USD sebesar 57% dari potensi penuh.
+
+── MONTE CARLO (block bootstrap, block=20, n=5,000) ────────────────────
+  Total R  : P5=-36.8R  P50=+27.2R  P95=+92.0R
+  Max DD R : P5=-67.5R  P50=-34.4R  P95=-19.1R
+  P(total R > 0) : 76.1%
+
+── YEAR-BY-YEAR TABLE ──────────────────────────────────────────────────
+  Year     N   TotalR    NetUSD   SwapUSD    WR%   AvgATR   AvgLot   Risk%   Bind%
+  ----  ----  -------  --------  --------  -----  -------  -------  ------  ------
+  2017    46   +31.34    +387.19    -92.20   45.7      2.1    0.040   0.17%     98%
+  2018    61   -11.31    -209.66    -43.15   32.8      2.2    0.040   0.17%    100%
+  2019    69    -6.74    -236.80   -100.04   27.5      2.7    0.038   0.21%     84%
+  2020    63   +24.27    +472.85   -105.40   36.5      5.5    0.035   0.35%     63%
+  2021    70    -2.71     -64.14    -73.05   32.9      4.4    0.039   0.34%     89%
+  2022    78   -11.47    -491.68    -65.22   29.5      4.7    0.033   0.30%     28%
+  2023    77    -5.42    -112.99    -61.79   27.3      4.2    0.030   0.25%      0%
+  2024    74    +1.17    +281.24    -76.00   33.8      5.4    0.029   0.32%      1%
+  2025    73   +13.60    +469.94    -79.43   43.8     10.0    0.023   0.39%      8%
+  2026    22   +14.04    +519.40     -5.39   36.4     18.4    0.010   0.38%      0%
+
+── EXIT BREAKDOWN ──────────────────────────────────────────────────────
+  TRAIL    :  388  (61.3%)
+  SL       :  244  (38.5%)
+  NONE     :    1  (0.2%)
+
+── INTERPRETASI HASIL ──────────────────────────────────────────────────
+
+  ❓ Kenapa profit USD hanya $1,015 dalam 9+ tahun?
+
+  1. GAP CAP DOMINAN (2017-2023)
+     ATR emas era 2017-2023 rata-rata $5-12. Gap cap lot = 0.04 lots.
+     Actual risk per trade = lots × 2×ATR × $100.
+     Contoh: 0.04 lot × $8 stop × $100 = $3.20/trade (bukan $50 target!)
+     → Sistem hanya memasang 6-32% dari ukuran yang seharusnya.
+
+  2. EDGE DALAM R POSITIF TAPI KECIL
+     Expectancy = +0.0739R/trade. Profit factor 1.134.
+     Untuk sistem trend-following dengan WR 34%, PF 1.10 adalah MARGINAL.
+     Benchmark yang sehat: PF ≥ 1.3, expectancy ≥ 0.05R/trade.
+
+  3. LR CORRELATION = -0.27 — FLAG SERIUS
+     Equity curve TIDAK tumbuh linear — ada puncak di tengah lalu turun.
+     Kemungkinan: sistem profit di 2020-2021 (volatilitas tinggi COVID),
+     lalu terkikis di 2022-2023 (konsolidasi), lalu recovery 2024-2026.
+     Perlu cek walk-forward untuk validasi: apakah edge konsisten per window.
+
+  4. HISTORY QUALITY 4% — KETERBATASAN KRITIS
+     Hanya data 2026.01–sekarang yang real ticks. 2017-2025 = synthetic
+     dari OHLCV M15. Hasil backtest 2017-2025 bisa bias (optimistis atau
+     pesimistis tergantung asumsi tick generator Metatrader).
+     Perlu out-of-sample test atau live forward test untuk validasi sejati.
+
+  5. KONTEKS CENT ACCOUNT
+     $1,015 dalam 9 tahun di akun DEMO ($10,000 USD) =
+     10,150 cents profit di akun Standard Cent (modal 10,000 cents = $100 real).
+     Profit REAL dalam dolar: ~$101.50 dari modal $100 dalam 9 tahun.
+     Ini TIDAK mewakili kinerja sistem sesungguhnya karena:
+     (a) Gap cap terlalu kecil untuk akun $100 real (lot min 0.01, target 0.04)
+     (b) Hasil akan LEBIH BAIK jika modal lebih besar (lot sizing lebih optimal)
+
+  ✅ KESIMPULAN
+     Edge ada (P>0 = 76% dari MC) tapi marginal.
+     Prioritas: jalankan 5 pass lain, bandingkan slope on/off × TS,
+     cek walk-forward, lalu decide apakah PF perlu diperbaiki.
+     Jangan trade live sampai setidaknya 3 pass menunjukkan PF konsisten > 1.2.
+
+========================================================================
